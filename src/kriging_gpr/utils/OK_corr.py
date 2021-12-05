@@ -1,0 +1,90 @@
+import numpy.matlib as npm
+import numpy as np
+def OK_corr(corr_model, theta, D_X):
+    d1 = D_X.shape[1]
+    d2 = D_X.shape[2]
+    d = theta.shape[0]
+    # print(d1, d2,d)
+    # print(theta)
+    # print("*******************")
+    # print(corr_model)
+    if corr_model == 0:
+        X = np.reshape(theta, (d,1, 1))
+        # print(X)
+        # print("*******************")
+        rep_x = npm.tile(X, (1,d1, d2))
+        # print(rep_x)
+        # print("*******************")
+        mul_part = (np.abs(D_X) * rep_x)
+        # print(mul_part)
+        # print("*******************")
+        max_part = np.maximum(1-mul_part,0)
+        # print(max_part)
+        R_unshaped = np.prod(max_part,1)
+        R = np.reshape(np.transpose(R_unshaped), (1,R_unshaped.shape[1],R_unshaped.shape[0]))
+        # print("*******************")
+        # print(R.shape)
+        # print("*******************")
+
+    elif corr_model == 1:
+        X = np.reshape(theta,(d,1,1))
+        # print(X)
+        # print("*******************")
+        rep_x = npm.tile(X,(1,d1, d2))
+        # print(rep_x)
+        # print("*******************")
+        pre_mult = (-1*(np.abs(D_X)**corr_model))
+        # print(pre_mult)
+        # print("**********************")
+        mul_part = (pre_mult * rep_x)
+        # print(mul_part)
+        # print("*******************")
+        sum_part = np.sum(mul_part,0)
+        R = np.exp(sum_part)
+        # print("*******************")
+        # print(R.shape)
+        # print("*******************")
+
+    elif corr_model ==  2:
+        X = np.reshape(theta,(d,1,1))
+        # print(X)
+        # print("*******************")
+        # rep_x = npm.tile(X,(1,d1, d2))
+        # print(rep_x)
+        # print("*******************")
+        pre_mult = (-1*(np.abs(D_X)**corr_model))
+        # print(pre_mult)
+        # print("**********************")
+        mul_part = (pre_mult * X)
+        # print(mul_part)
+        # print("*******************")
+        sum_part = np.sum(mul_part,0)
+        # print(sum_part)
+        R = np.exp(sum_part)
+        # print("*******************")
+        # print(R)
+        # print("*******************")
+
+    elif corr_model == 3:
+        X = np.reshape(theta,(d,1,1))
+        
+        # print(X)
+        # print("*******************")
+        rep_x = npm.tile(X,(1,d1, d2))
+        
+        term_1 = np.array((D_X<=(rep_x/2.)), dtype=bool)
+        term_2_1 = 6*((D_X/rep_x)**2)
+        term_2_2 = 6*((D_X/rep_x)**3)
+        term_2 = 1 - term_2_1 + term_2_2
+        term_3_1 = ((rep_x/2.)<D_X)
+        term_3_2 = (D_X<=rep_x)
+        term_3 = np.array((term_3_1 & term_3_2), dtype=bool)
+        term_4 = (2*((1-D_X)/rep_x)**3)
+        # print(term_1.shape)
+        # print(term_2.shape)
+        # print(term_3.shape)
+        # print(term_4.shape)
+        R = np.prod(term_1 * term_2 + term_3 * term_4,0)
+        # print(term_4)
+    #     R = prod(((D_X<=(T./2)).*(1-6*(D_X./T).^2+6*(D_X./T).^3)+((T./2)<D_X & D_X<=T).*(2*(1-D_X./T).^3)),3)
+    return R
