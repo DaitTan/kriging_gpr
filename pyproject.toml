@@ -1,11 +1,14 @@
 [tool.poetry]
 name = "kriging_gpr"
-version = "0.1.1"
+version = "0.1.3"
 description = "Gaussian Process Regression Package from Matlab to Python"
 authors = ["Tanmay Khandait <tkhandai@asu.edu>"]
 
 [tool.poetry.dependencies]
 python = ">=3.7.1,<3.10"
+scikit-learn = ">0.24.2"
+scipy = ">1.7.1"
+scikit-optimize = ">0.8.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

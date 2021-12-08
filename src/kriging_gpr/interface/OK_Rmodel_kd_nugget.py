@@ -2,7 +2,7 @@ import numpy as np
 np.set_printoptions(threshold=np.inf)
 from scipy.optimize import minimize
 from scipy.optimize import Bounds
-from scipy.linalg import eigh
+from scipy.linalg import eigh, cholesky, inv, lstsq
 
 from ..utils.OK_regr import OK_regr
 from ..utils.OK_corr import OK_corr
@@ -34,7 +34,7 @@ def OK_Rmodel_kd_nugget(data_in, data_out, regr_model, corr_model):
 
 
     regr = OK_regr(normal_data,regr_model)
-    beta_0 = np.linalg.lstsq(((np.transpose(regr) @ regr)), (np.transpose(regr) @ data_out), rcond=None)
+    beta_0 = lstsq(((np.transpose(regr) @ regr)), (np.transpose(regr) @ data_out))
     
     beta_0 = beta_0[0]
     sigma_z0 = np.var(data_out-(regr @ beta_0))
@@ -97,7 +97,7 @@ def OK_Rmodel_kd_nugget(data_in, data_out, regr_model, corr_model):
     
     # fun([3.07342516, 3.08924981])
     
-    params = minimize(fun, np.ndarray.flatten(theta_0), method = 'Nelder-Mead', bounds = bnds, options = options)
+    params = minimize(fun, np.ndarray.flatten(theta_0), method = 'L-BFGS-B', bounds = bnds, options = options)
 
     theta = np.reshape(params.x, (dim,1))
 
@@ -105,15 +105,15 @@ def OK_Rmodel_kd_nugget(data_in, data_out, regr_model, corr_model):
 
     CR = (R+delta_lb*np.eye(R.shape[0],R.shape[1]))
 
-    U0 = np.linalg.cholesky(CR).transpose()
+    U0 = cholesky(CR, lower = True)
     CR=U0
     L  = np.transpose(U0)
     D_L = np.transpose(U0)
-    Linv = np.linalg.inv(L)
+    Linv = inv(L)
     Rinv = Linv.transpose() @ Linv
 
-    beta = np.linalg.inv(np.transpose(regr) @ Rinv @ regr)@(np.transpose(regr) @ (Rinv @ data_out))
-    beta_v = np.linalg.inv(np.transpose(regr) @ Rinv @ regr)@(np.transpose(regr) @ Rinv)
+    beta = inv(np.transpose(regr) @ Rinv @ regr)@(np.transpose(regr) @ (Rinv @ data_out))
+    beta_v = inv(np.transpose(regr) @ Rinv @ regr)@(np.transpose(regr) @ Rinv)
     sigma_z = (1/num_samples) * (np.transpose(data_out - (regr @ beta)) @ Rinv @ (data_out - (regr@beta)))
     # print("*******************")
     # print(beta)
@@ -134,10 +134,10 @@ def OK_Rmodel_kd_nugget(data_in, data_out, regr_model, corr_model):
     'corr' : corr_model,
     'L' : L,
     'D_L' : D_L,
-    'Z' : np.linalg.lstsq(L,(data_out-regr@beta), rcond=None),
-    'Z_v' : np.linalg.lstsq(L,(np.eye(np.max(data_out.shape))-regr@beta_v), rcond=None),
-    'Z_m' : np.linalg.inv(L),
-    'DZ_m' : np.linalg.inv(D_L),
+    'Z' : lstsq(L,(data_out-regr@beta)),
+    'Z_v' : lstsq(L,(np.eye(np.max(data_out.shape))-regr@beta_v)),
+    'Z_m' : inv(L),
+    'DZ_m' : inv(D_L),
     'Rinv' : Rinv,
     'nugget' : delta_lb}
     return M_model
