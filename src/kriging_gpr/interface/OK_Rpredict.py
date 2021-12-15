@@ -4,7 +4,7 @@ from ..utils.OK_corr import OK_corr
 
 import numpy as np
 
-def OK_Rpredict(gp_model, Xtest, regr_model, Ytrain):
+def OK_Rpredict(gp_model, Xtest, regr_model):
     X = gp_model['X']
     min_X = gp_model['min_X']
     max_X = gp_model['max_X']
@@ -17,6 +17,7 @@ def OK_Rpredict(gp_model, Xtest, regr_model, Ytrain):
     sigma_z = gp_model['sigma_z']
     corr_model = gp_model['corr']
     F = np.ones((num_samples,1))
+    Ytrain = gp_model['Y']
 
 
     num_samples_test = Xtest.shape[0]

@@ -53,7 +53,7 @@ corr_model = 2
 # print(Xtrain)
 # print(Ytrain)
 
-gp_model = OK_Rmodel_kd_nugget(Xtrain, data_out, 0, 2)
+gp_model = OK_Rmodel_kd_nugget(Xtrain, data_out, 0, 2, 5)
 
 # import pprint
 # pp = pprint.PrettyPrinter(indent = 3)
@@ -82,7 +82,7 @@ test_input = np.concatenate((x_, y_),2)
 test_output =  np.transpose(calculate_robustness(test_input, test_func))
 
 
-f, mse = OK_Rpredict(gp_model, test_input[0], 0, Ytrain)
+f, mse = OK_Rpredict(gp_model, test_input[0], 0)
 
 pred_ci_lower = f - 1.96*mse
 pred_ci_upper = f + 1.96*mse

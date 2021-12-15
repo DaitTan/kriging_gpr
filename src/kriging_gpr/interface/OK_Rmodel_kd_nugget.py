@@ -9,7 +9,7 @@ from ..utils.OK_corr import OK_corr
 from ..utils.OK_Rlh_kd_nugget import OK_Rlh_kd_nugget
 from ..utils.normalize_data import normalize_data
 
-def OK_Rmodel_kd_nugget(data_in, data_out, regr_model, corr_model):
+def OK_Rmodel_kd_nugget(data_in, data_out, regr_model, corr_model, parameter_a):
     # print(Xtrain)
     num_samples, dim = data_in.shape
     # print("**************************************************************************************")
@@ -73,7 +73,7 @@ def OK_Rmodel_kd_nugget(data_in, data_out, regr_model, corr_model):
     corr = OK_corr(corr_model, theta_0, D_x)
     
 
-    a = 5
+    a = parameter_a
     # eigen_v, eigen_vec = np.linalg.eig(corr)
     cond_ = np.linalg.cond(corr, p=2)
     exp_ = np.exp(a)
@@ -139,7 +139,8 @@ def OK_Rmodel_kd_nugget(data_in, data_out, regr_model, corr_model):
     'Z_m' : np.linalg.inv(L),
     'DZ_m' : np.linalg.inv(D_L),
     'Rinv' : Rinv,
-    'nugget' : delta_lb}
+    'nugget' : delta_lb,
+    'Y' : data_out}
     return M_model
 
 
