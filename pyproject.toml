@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "kriging_gpr"
-version = "0.1.3"
+version = "0.1.0"
 description = "Gaussian Process Regression Package from Matlab to Python"
 authors = ["Tanmay Khandait <tkhandai@asu.edu>"]
 

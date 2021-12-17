@@ -48,7 +48,7 @@ def OK_Rpredict(gp_model, Xtest, regr_model):
         OneMinusFcrossR = 1-(F.transpose()@Rinv_Rpred[:,r])
         
         mse_temp = sigma_z * (1 - R_pred[:,r].transpose()@Rinv_Rpred[:,r] + (OneMinusFcrossR).transpose()@FRFinv@(OneMinusFcrossR))
-        mse[r,0] = mse_temp[0,0]
+        mse[r,0] = np.sqrt(mse_temp[0,0])
 
 
 
